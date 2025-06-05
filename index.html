@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Neon Countdown to 2028</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #0a0a0a;
+      font-family: 'Segoe UI', sans-serif;
+      color: #00fff7;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3.5em;
+      color: #ffffff;
+      text-shadow: 0 0 15px #ff00cc, 0 0 30px #ff00cc;
+      animation: glowTitle 2s ease-in-out infinite alternate;
+      opacity: 0;
+      animation: fadeIn 2s forwards;
+    }
+
+    .countdown {
+      margin-top: 20px;
+      font-size: 2.5em;
+      padding: 20px 40px;
+      border: 2px solid #00fff7;
+      border-radius: 15px;
+      background-color: rgba(0, 0, 0, 0.2);
+      box-shadow: 0 0 20px #00fff7, 0 0 40px #00fff7 inset;
+      animation: pulse 2s infinite ease-in-out, fadeIn 3s 1s forwards;
+      opacity: 0;
+    }
+
+    @keyframes glowTitle {
+      from {
+        text-shadow: 0 0 10px #ff00cc;
+      }
+      to {
+        text-shadow: 0 0 30px #ff00cc, 0 0 60px #ff00cc;
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 20px #00fff7, 0 0 40px #00fff7 inset;
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 40px #00fff7, 0 0 80px #00fff7 inset;
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px #00fff7, 0 0 40px #00fff7 inset;
+      }
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+
+  <div class="container">
+    <h1>I Have Everything Timer</h1>
+    <div class="countdown" id="countdown">Loading...</div>
+  </div>
+
+  <script>
+    // Particle background
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    for (let i = 0; i < 120; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.5 + 0.5,
+        dx: (Math.random() - 0.5) * 0.3,
+        dy: (Math.random() - 0.5) * 0.3,
+      });
+    }
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#00fff7';
+      for (let p of particles) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        p.x += p.dx;
+        p.y += p.dy;
+
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+      }
+      requestAnimationFrame(drawParticles);
+    }
+
+    drawParticles();
+
+    // Countdown logic
+    const targetDate = new Date("January 1, 2028 00:00:00").getTime();
+    const countdownElement = document.getElementById("countdown");
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = targetDate - now;
+
+      if (distance < 0) {
+        countdownElement.innerHTML = "🎉 It's 2028!";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+  </script>
+</body>
+</html>
